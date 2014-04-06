@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ant [
+	<!ENTITY poison.ivy.version "1.0-SNAPSHOT">
+]>
+<project name="PoisonIvy" basedir="." default="create deployables" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:m="http://ant.apache.org/ivy/maven" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+	<!-- defined maven snapshots and staging repository id and url -->
+	<property name="poison.ivy.version" value="&poison.ivy.version;"/>
+	<property name="maven-snapshots-repository-id" value="sonatype-nexus-snapshots" />
+	<property name="maven-snapshots-repository-url" value="https://oss.sonatype.org/content/repositories/snapshots/" />
+	<property name="maven-staging-repository-id" value="sonatype-nexus-staging" />
+	<property name="maven-staging-repository-url" value="https://oss.sonatype.org/service/local/staging/deploy/maven2/" />
+
+	<!-- define Maven coordinates -->
+	<property name="artifactId" value="PoisonIvy" />
+
+	<!-- define artifacts' name, which follows the convention of Maven -->
+	<property name="maven-jar" value="${basedir}/build/${artifactId}-&poison.ivy.version;.jar" />
+	<property name="maven-javadoc-jar" value="${basedir}/build/${artifactId}-&poison.ivy.version;-javadoc.jar" />
+	<property name="maven-sources-jar" value="${basedir}/build/${artifactId}-&poison.ivy.version;-sources.jar" />
+	<property name="maven-config-zip" value="${basedir}/build/${artifactId}-&poison.ivy.version;-config.zip" />
+
+	<path id="poison.ivy.classpath">
+		<fileset dir="${basedir}/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	
+	<path id="poison.ivy.src">
+		<dirset dir="${basedir}">
+			<include name="src"/>
+		</dirset>
+	</path>
+
+	<target name="init">
+		<delete dir="build" />
+		<mkdir dir="build" />
+	</target>
+
+	<target name="create pom">
+		<ivy:makepom ivyfile="ivy.xml" pomfile="PoisonIvy.pom" />
+	</target>
+
+	<ivy:settings refid="ivysettings" file="${user.home}/.ivy/ivysettings-sonatype.xml"/>
+	
+	<target name="snapshot" depends="create deployables, deploy snapshot"/>	
+	<target name="staging" depends="create deployables, deploy staging"/>
+	
+	<target name="deploy snapshot">
+		<antcall target="copypom">
+			<param name="to.pom" value="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
+			<param name="from.pom" value="${basedir}/pom.xml"/>
+		</antcall>
+		
+		<antcall target="deployImpl">
+			<param name="resolver" value="sonatype-nexus-snapshots"/>
+			<param name="status" value="integration"/>
+			<param name="poison.ivy.module" value="PoisonIvy"/>
+			<param name="poison.ivy.ivy.file" value="ivy.xml"/>
+		</antcall>
+	</target>
+	
+	<target name="deploy staging">
+		<antcall target="copypom">
+			<param name="to.pom" value="${basedir}/build/poison-ivy-&poison.ivy.version;.pom"/>
+			<param name="from.pom" value="${basedir}/pom.xml"/>
+		</antcall>
+		
+		<antcall target="deployImpl">
+			<param name="resolver" value="sonatype-nexus-staging"/>
+			<param name="status" value="release"/>
+			<param name="poison.ivy.module" value="PoisonIvy"/>
+			<param name="poison.ivy.ivy.file" value="ivy.xml"/>
+		</antcall>
+	</target>
+	
+	<target name="copypom">
+		<copyfile dest="${to.pom}" src="${from.pom}"/>
+		<replace file="${to.pom}" token="$poison.ivy.version" value="&poison.ivy.version;"/>
+	</target>
+	
+	<target name="deployImpl">
+		<ivy:resolve file="${poison.ivy.ivy.file}"/>
+		<ivy:publish
+			artifactspattern="${basedir}/build/[artifact]-[revision](-[classifier]).[ext]"
+			resolver="${resolver}"
+			organisation="com.github.mrstampy"
+			module="${poison.ivy.module}"
+			overwrite="true"
+			status="${status}"
+			pubrevision="&poison.ivy.version;">
+		</ivy:publish>
+	</target>
+	
+	<!--
+		Creates all the artifacts
+	-->
+	<target name="create deployables" depends="init">
+		<ivy:resolve />
+		<antcall target="create deployables impl"/>
+	</target>
+	<target name="create deployables impl" depends="create jar, create source jar, create javadoc jar" />
+
+	<target name="create jar">
+		<jar destfile="${maven-jar}" basedir="${basedir}/bin">
+			<manifest id="poison.ivy.javadoc.manifest">
+				<attribute name="Built-By" value="Burton Alexander" />
+				<attribute name="Email-Address" value="burton@users.sourceforge.net" />
+				<attribute name="Project-Website" value="http://mrstampy.github.com/PoisonIvy/" />
+				<attribute name="Release-Number" value="&poison.ivy.version;" />
+				<attribute name="Release-Description" value="Integration" />
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="create source jar">
+		<antcall target="jar creator">
+			<param name="jar.destfile" value="${maven-sources-jar}" />
+			<param name="jar.basedir" value="${basedir}/src"/>
+		</antcall>
+	</target>
+
+	<target name="create javadoc jar">
+		<delete dir="${basedir}/build/javadoc" />
+		<mkdir dir="${basedir}/build/javadoc" />
+
+		<javadoc 
+			classpathref="poison.ivy.classpath" 
+			sourcepathref="poison.ivy.src" 
+			packagenames="com.github.mrstampy.*"
+			description="Poison Ivy - Java Library Dependency Resolver and Application Launcher"
+			doctitle="Poison Ivy - Java Library Dependency Resolver and Application Launcher"
+			header="Poison Ivy - Java Library Dependency Resolver and Application Launcher"
+			footer="brought to you by Mr. Stampy"
+			destdir="${basedir}/build/javadoc">
+		</javadoc>
+
+		<antcall target="jar creator">
+			<param name="jar.destfile" value="${maven-javadoc-jar}" />
+			<param name="jar.basedir" value="${basedir}/build/javadoc"/>
+		</antcall>
+	</target>
+	
+	<target name="jar creator">
+		<jar destfile="${jar.destfile}" basedir="${jar.basedir}">
+			<manifest id="poison.ivy.javadoc.manifest">
+				<attribute name="Built-By" value="Burton Alexander" />
+				<attribute name="Email-Address" value="burton@users.sourceforge.net" />
+				<attribute name="Project-Website" value="http://mrstampy.github.com/PoisonIvy/" />
+				<attribute name="Release-Number" value="&poison.ivy.version;" />
+				<attribute name="Release-Description" value="Integration" />
+			</manifest>
+		</jar>
+	</target>
+
+</project>

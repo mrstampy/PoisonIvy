@@ -18,7 +18,7 @@
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  * 
  */
-package com.github.mrtstampy.poisonivy;
+package com.github.mrstampy.poisonivy;
 
 import static java.lang.System.exit;
 import static java.lang.System.out;
