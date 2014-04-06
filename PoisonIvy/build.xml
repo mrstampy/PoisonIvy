@@ -47,10 +47,7 @@
 	<target name="staging" depends="create deployables, deploy staging"/>
 	
 	<target name="deploy snapshot">
-		<antcall target="copypom">
-			<param name="to.pom" value="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
-			<param name="from.pom" value="${basedir}/pom.xml"/>
-		</antcall>
+		<ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
 		
 		<antcall target="deployImpl">
 			<param name="resolver" value="sonatype-nexus-snapshots"/>
