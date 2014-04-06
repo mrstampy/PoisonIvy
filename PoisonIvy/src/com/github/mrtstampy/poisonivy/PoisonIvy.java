@@ -49,7 +49,7 @@ public class PoisonIvy {
 	}
 
 	public boolean execute() throws Exception {
-		String[] poisonArgs = getArgs(args);
+		String[] poisonArgs = getArgs();
 
 		Parser parser = new BasicParser();
 		CommandLine cli = parser.parse(getOptions(), poisonArgs);
@@ -67,7 +67,7 @@ public class PoisonIvy {
 		return false;
 	}
 
-	protected String[] getArgs(String[] args) throws IOException {
+	protected String[] getArgs() throws IOException {
 		File poisonIvyConfig = new File(POISONIVY_CONFIG);
 
 		if ((args == null || args.length == 0) && !poisonIvyConfig.exists()) {
