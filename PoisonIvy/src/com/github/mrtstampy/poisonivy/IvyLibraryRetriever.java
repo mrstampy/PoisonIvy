@@ -34,22 +34,22 @@ import org.slf4j.LoggerFactory;
 /**
  * This class uses <a href="http://ant.apache.org/ivy>Apache Ivy</a> to retrieve
  * libraries for the ivy file specified. By default it is expected to be
- * {@link IvyLibraryRetriever#IVY_XML} - './ivy.xml'.<br>
+ * {@link IvyLibraryRetriever#IVY_XML}.<br>
  * <br>
  * The libraries retrieved are saved by default to
- * {@link IvyLibraryRetriever#LIBRARIES_DIR} - './ivylib'. Other parameters are
+ * {@link IvyLibraryRetriever#LIBRARIES_DIR}. Other parameters are
  * explained below.
  */
 public class IvyLibraryRetriever {
 	private static final Logger log = LoggerFactory.getLogger(IvyLibraryRetriever.class);
 
-	/** The Constant IVY_XML './ivy.xml' */
+	/** The Constant IVY_XML {@value #IVY_XML} */
 	public static final String IVY_XML = "./ivy.xml";
 
-	/** The Constant LIBRARIES_DIR './ivylib'. */
+	/** The Constant LIBRARIES_DIR {@value #LIBRARIES_DIR}. */
 	public static final String LIBRARIES_DIR = "./ivylib";
 
-	/** The Constant RESOLVE_PATTERN '[artifact]-[revision](-[classifier]).[ext]'. */
+	/** The Constant RESOLVE_PATTERN {@value #RESOLVE_PATTERN}. */
 	public static final String RESOLVE_PATTERN = "[artifact]-[revision](-[classifier]).[ext]";
 
 	private static final String[] srcsNDocs = { "-javadoc.", "-javadocs.", "-doc.", "-source.", "-sources.", "-src." };
