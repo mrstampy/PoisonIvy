@@ -273,6 +273,7 @@ public class PoisonIvy {
 	 * 
 	 * @see #MAIN_CLASS_PARM
 	 * @see #MAIN_JAR_PARM
+	 * @see #JAVA_OPTS_PARM
 	 */
 	protected void executeMain(CommandLine cli) throws IOException {
 		Runtime.getRuntime().exec(getCommand(cli));
@@ -285,6 +286,7 @@ public class PoisonIvy {
 	 *          the cli
 	 * @return the command
 	 * 
+	 * @see #MAIN_CLASS_PARM
 	 * @see #MAIN_JAR_PARM
 	 * @see #JAVA_OPTS_PARM
 	 */
