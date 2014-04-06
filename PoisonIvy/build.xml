@@ -37,10 +37,6 @@
 		<mkdir dir="build" />
 	</target>
 
-	<target name="create pom">
-		<ivy:makepom ivyfile="ivy.xml" pomfile="PoisonIvy.pom" />
-	</target>
-
 	<ivy:settings refid="ivysettings" file="${user.home}/.ivy/ivysettings-sonatype.xml"/>
 	
 	<target name="snapshot" depends="create deployables, deploy snapshot"/>	
@@ -58,10 +54,7 @@
 	</target>
 	
 	<target name="deploy staging">
-		<antcall target="copypom">
-			<param name="to.pom" value="${basedir}/build/poison-ivy-&poison.ivy.version;.pom"/>
-			<param name="from.pom" value="${basedir}/pom.xml"/>
-		</antcall>
+		<ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
 		
 		<antcall target="deployImpl">
 			<param name="resolver" value="sonatype-nexus-staging"/>
