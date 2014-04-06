@@ -13,13 +13,17 @@ import org.slf4j.LoggerFactory;
 
 public class IvyLibraryRetriever {
 	private static final Logger log = LoggerFactory.getLogger(IvyLibraryRetriever.class);
-
+	
+	public static final String IVY_XML = "./ivy.xml";
 	public static final String LIBRARIES_DIR = "ivylib";
-	public static final String RESOLVE_PATTERN = LIBRARIES_DIR + "/[artifact]-[revision](-[classifier]).[ext]";
+	public static final String RESOLVE_PATTERN = "[artifact]-[revision](-[classifier]).[ext]";
 
 	private static final String[] srcsNDocs = { "-javadoc.", "-javadocs.", "-doc.", "-source.", "-sources.", "-src." };
 
 	private boolean cleanSourcesAndJavadoc = true;
+
+	private String libdir = LIBRARIES_DIR;
+	private String resolvePattern = libdir + File.separator + RESOLVE_PATTERN;
 
 	public boolean retrieveLibraries() throws Exception {
 		return retrieveLibraries(false);
@@ -40,32 +44,32 @@ public class IvyLibraryRetriever {
 			log.debug("Libraries previously retrieved");
 			return true;
 		}
-		
-		if(force) clearLibraryDirectory();
 
-		File ivy = getFile(ivyfile == null ? "./ivy.xml" : ivyfile, "ivy");
+		if (force) clearLibraryDirectory();
+
+		File ivy = getFile(ivyfile == null ? IVY_XML : ivyfile, "ivy");
 
 		return execIvyMain(ivy.getAbsolutePath(), ivysettings);
 	}
 
 	public void clearLibraryDirectory() {
 		log.debug("Clearing library directory");
-		File libdir = new File(LIBRARIES_DIR);
-		
-		if(libdir.exists()) {
+		File libdir = new File(getLibdir());
+
+		if (libdir.exists()) {
 			File[] files = libdir.listFiles();
-			for(File f : files) {
+			for (File f : files) {
 				deleteFile(f);
 			}
 			deleteFile(libdir);
 		}
-		
+
 		libdir.mkdir();
 	}
-	
+
 	private void deleteFile(File f) {
 		boolean b = f.delete();
-		if(b) {
+		if (b) {
 			log.debug("Deleted {}", f.getAbsolutePath());
 		} else {
 			log.error("Could not delete {}", f.getAbsolutePath());
@@ -79,7 +83,10 @@ public class IvyLibraryRetriever {
 			getFile(ivysettings, "ivy settings");
 		}
 
-		Process p = Runtime.getRuntime().exec(createCommand(ivyfile, ivysettings));
+		String[] cmd = createCommand(ivyfile, ivysettings);
+		logCmd(cmd);
+		
+		Process p = Runtime.getRuntime().exec(cmd);
 		int code = p.waitFor();
 
 		logOutput(p.getInputStream());
@@ -90,14 +97,23 @@ public class IvyLibraryRetriever {
 			if (isCleanSourcesAndJavadoc()) cleanSourcesAndJavadoc();
 			return true;
 		}
-		
+
 		log.error("Ivy library retrieval completed with {}", code);
-		
+
 		return false;
 	}
 
+	private void logCmd(String[] cmd) {
+		if(!log.isDebugEnabled()) return;
+		
+		log.debug("Executing with the following command parameters:");
+		for(String s : cmd) {
+			log.debug("**** Command parameter: {}", s);
+		}
+	}
+
 	private void cleanSourcesAndJavadoc() {
-		File libdir = new File(LIBRARIES_DIR);
+		File libdir = new File(getLibdir());
 
 		File[] sourcesAndJavadoc = libdir.listFiles(new FileFilter() {
 
@@ -158,7 +174,7 @@ public class IvyLibraryRetriever {
 		}
 
 		command.add("-retrieve");
-		command.add(RESOLVE_PATTERN);
+		command.add(getResolvePattern());
 
 		return command.toArray(new String[] {});
 	}
@@ -175,7 +191,7 @@ public class IvyLibraryRetriever {
 	}
 
 	public boolean librariesRetrieved() {
-		File lib = new File(LIBRARIES_DIR);
+		File lib = new File(getLibdir());
 		if (!lib.exists()) return false;
 		if (!lib.isDirectory()) return false;
 
@@ -196,6 +212,22 @@ public class IvyLibraryRetriever {
 
 	public void setCleanSourcesAndJavadoc(boolean cleanSourcesAndJavadoc) {
 		this.cleanSourcesAndJavadoc = cleanSourcesAndJavadoc;
+	}
+
+	public String getLibdir() {
+		return libdir == null ? LIBRARIES_DIR : libdir;
+	}
+
+	public void setLibdir(String libdir) {
+		this.libdir = libdir;
+	}
+
+	public String getResolvePattern() {
+		return resolvePattern == null ? getLibdir() + File.separator + RESOLVE_PATTERN : resolvePattern;
+	}
+
+	public void setResolvePattern(String resolvePattern) {
+		this.resolvePattern = resolvePattern;
 	}
 
 }
