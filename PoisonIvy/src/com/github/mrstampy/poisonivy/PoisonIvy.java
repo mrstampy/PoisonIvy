@@ -247,7 +247,7 @@ public class PoisonIvy {
 		out.println();
 		printExamples();
 		out.println();
-		out.println("See some website for more information");
+		out.println("See http://mrstampy.github.io/PoisonIvy/ for more information");
 	}
 
 	private void printExamples() {
