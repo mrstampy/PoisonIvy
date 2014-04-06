@@ -287,9 +287,7 @@ public class PoisonIvy {
 		command.add("-cp");
 		command.add(IvyLibraryRetriever.getClasspath());
 
-		if (cli.hasOption(JAVA_OPTS_PARM)) {
-			command.add(cli.getOptionValue(JAVA_OPTS_PARM));
-		}
+		if (cli.hasOption(JAVA_OPTS_PARM)) command.add(cli.getOptionValue(JAVA_OPTS_PARM));
 
 		if (cli.hasOption(MAIN_JAR_PARM)) {
 			command.add("-jar");
