@@ -27,6 +27,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,16 +56,19 @@ public class PoisonIvy {
 	private static final Logger log = LoggerFactory.getLogger(PoisonIvy.class);
 
 	/** The Constant MAIN_JAR_PARM -{@value #MAIN_JAR_PARM}. */
-	public static final String MAIN_JAR_PARM = "mainjar";
+	public static final String MAIN_JAR_PARM = "mj";
+
+	/** The Constant MAIN_JAR_PARM -{@value #MAIN_CLASS_PARM}. */
+	public static final String MAIN_CLASS_PARM = "mc";
 
 	/** The Constant JAVA_OPTS_PARM -{@value #JAVA_OPTS_PARM}. */
-	public static final String JAVA_OPTS_PARM = "javaopts";
+	public static final String JAVA_OPTS_PARM = "jopts";
 
 	/** The Constant FORCE_PARM -{@value #FORCE_PARM}. */
-	public static final String FORCE_PARM = "force";
+	public static final String FORCE_PARM = "f";
 
 	/** The Constant HELP_PARM -{@value #HELP_PARM}. */
-	public static final String HELP_PARM = "help";
+	public static final String HELP_PARM = "h";
 
 	/** The Constant LIB_DIR_PARM -{@value #LIB_DIR_PARM}. */
 	public static final String LIB_DIR_PARM = "libdir";
@@ -129,16 +134,25 @@ public class PoisonIvy {
 				printHelpMessage();
 				return true;
 			} else if (executeLibraryRetrieval(cli)) {
-				if (cli.hasOption(MAIN_JAR_PARM)) executeMainJar(cli);
+				if (cli.hasOption(MAIN_JAR_PARM) || cli.hasOption(MAIN_CLASS_PARM)) executeMain(cli);
 				return true;
 			} else {
 				log.error("Could not retrieve libraries via ivy");
 			}
 		} catch (Exception e) {
 			log.error("Could not execute", e);
+			System.out.println(stackTraceToString(e));
 		}
 
 		return false;
+	}
+
+	private String stackTraceToString(Exception e) {
+		StringWriter writer = new StringWriter();
+		PrintWriter pw = new PrintWriter(writer);
+		e.printStackTrace(pw);
+
+		return writer.toString();
 	}
 
 	protected void logArgs(String[] args) {
@@ -230,22 +244,28 @@ public class PoisonIvy {
 	private void printExamples() {
 		out.println("Examples:");
 		out.println("");
-		out.println("-mainjar MyApplication.jar");
+		out.println("-mj MyApplication.jar");
 		out.println("");
-		out.println("-mainjar MyApplication.jar -javaopts '-Xmx1000m -Xms500m'");
+		out.println("-mj MyApplication.jar -jopts '-Xmx1000m -Xms500m'");
 		out.println("");
-		out.println("-ivy /path/to/ivy.xml -ivysettings /path/to/ivysettings.xml -libdir /path/to/ivylib -force -nc");
+		out.println("-mc com.my.MainClass -jopts '-Xmx1000m -Xms500m -Dmy.settings.file=/some/path/and/file'");
+		out.println("");
+		out.println("-ivy /path/to/ivy.xml -ivysettings /path/to/ivysettings.xml -libdir /path/to/ivylib -f -nc");
 	}
 
 	/**
-	 * Execute the main jar Java application using the command options specified.
+	 * Execute the main jar Java application or main class using the command
+	 * options specified.
 	 * 
 	 * @param cli
 	 *          the cli
 	 * @throws IOException
 	 *           Signals that an I/O exception has occurred.
+	 * 
+	 * @see #MAIN_CLASS_PARM
+	 * @see #MAIN_JAR_PARM
 	 */
-	protected void executeMainJar(CommandLine cli) throws IOException {
+	protected void executeMain(CommandLine cli) throws IOException {
 		Runtime.getRuntime().exec(getCommand(cli));
 	}
 
@@ -270,8 +290,12 @@ public class PoisonIvy {
 			command.add(cli.getOptionValue(JAVA_OPTS_PARM));
 		}
 
-		command.add("-jar");
-		command.add(cli.getOptionValue(MAIN_JAR_PARM));
+		if (cli.hasOption(MAIN_JAR_PARM)) {
+			command.add("-jar");
+			command.add(cli.getOptionValue(MAIN_JAR_PARM));
+		} else if (cli.hasOption(MAIN_CLASS_PARM)) {
+			command.add(cli.getOptionValue(MAIN_CLASS_PARM));
+		}
 
 		return command.toArray(new String[] {});
 	}
@@ -327,6 +351,7 @@ public class PoisonIvy {
 		opts.addOption(JAVA_OPTS_PARM, true,
 				"Java options to pass to the application jar (enclose in single quotes for multiple parameters)");
 		opts.addOption(MAIN_JAR_PARM, true, "The application jar to execute");
+		opts.addOption(MAIN_CLASS_PARM, true, "The main class to execute");
 
 		return opts;
 	}
