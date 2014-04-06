@@ -137,7 +137,7 @@ public class PoisonIvy {
 		} catch (Exception e) {
 			log.error("Could not execute", e);
 		}
-		
+
 		return false;
 	}
 
@@ -178,8 +178,8 @@ public class PoisonIvy {
 	}
 
 	/**
-	 * Parses the poison ivy config, reading the first line of the file as if it was
-	 * passed on the command line.
+	 * Parses the poison ivy config, reading the first line of the file as if it
+	 * was passed on the command line.
 	 * 
 	 * @param poisonIvyConfig
 	 *          the poison ivy config
@@ -221,7 +221,20 @@ public class PoisonIvy {
 
 		out.println();
 		out.println("The required options can be put into a file named '" + POISONIVY_CONFIG + "'");
+		out.println();
+		printExamples();
+		out.println();
 		out.println("See some website for more information");
+	}
+
+	private void printExamples() {
+		out.println("Examples:");
+		out.println("");
+		out.println("-mainjar MyApplication.jar");
+		out.println("");
+		out.println("-mainjar MyApplication.jar -javaopts '-Xmx1000m -Xms500m'");
+		out.println("");
+		out.println("-ivy /path/to/ivy.xml -ivysettings /path/to/ivysettings.xml -libdir /path/to/ivylib -force -nc");
 	}
 
 	/**
@@ -271,7 +284,7 @@ public class PoisonIvy {
 	 * @return true, if successful
 	 * @throws Exception
 	 *           the exception
-	 *           
+	 * 
 	 * @see #IVY_PARM
 	 * @see #IVY_SETTINGS_PARM
 	 * @see #NO_CLEAN_PARM
@@ -313,7 +326,7 @@ public class PoisonIvy {
 		opts.addOption(LIB_DIR_PARM, true, "The directory to store the retrieved librarires (default: ./ivylib)");
 		opts.addOption(JAVA_OPTS_PARM, true,
 				"Java options to pass to the application jar (enclose in single quotes for multiple parameters)");
-		opts.addOption(MAIN_JAR_PARM, true, "The application jar to execute (java -jar [mainjar])");
+		opts.addOption(MAIN_JAR_PARM, true, "The application jar to execute");
 
 		return opts;
 	}
