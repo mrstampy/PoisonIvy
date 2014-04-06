@@ -37,8 +37,8 @@ import org.slf4j.LoggerFactory;
  * {@link IvyLibraryRetriever#IVY_XML}.<br>
  * <br>
  * The libraries retrieved are saved by default to
- * {@link IvyLibraryRetriever#LIBRARIES_DIR}. Other parameters are
- * explained below.
+ * {@link IvyLibraryRetriever#LIBRARIES_DIR}. Other parameters are explained
+ * below.
  */
 public class IvyLibraryRetriever {
 	private static final Logger log = LoggerFactory.getLogger(IvyLibraryRetriever.class);
@@ -288,7 +288,10 @@ public class IvyLibraryRetriever {
 
 		String[] libs = lib.list();
 
-		log.debug("Libraries: ", (Object[]) libs);
+		log.debug("Libraries in {}", getLibdir());
+		for (String s : libs) {
+			log.debug("**** Library: {}", s);
+		}
 
 		return libs != null && libs.length > 0;
 	}
