@@ -35,6 +35,7 @@ import java.util.List;
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Option;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
 import org.slf4j.Logger;
@@ -246,9 +247,9 @@ public class PoisonIvy {
 		out.println("");
 		out.println("-mj MyApplication.jar");
 		out.println("");
-		out.println("-mj MyApplication.jar -jopts '-Xmx1000m -Xms500m'");
+		out.println("-mj MyApplication.jar -X mx1000m -X ms500m");
 		out.println("");
-		out.println("-mc com.my.MainClass -jopts '-Xmx1000m -Xms500m -Dmy.settings.file=/some/path/and/file'");
+		out.println("-mc com.my.MainClass -X mx1000m -X ms500m -D my.settings.file=/some/path/and/file");
 		out.println("");
 		out.println("-ivy /path/to/ivy.xml -ivysettings /path/to/ivysettings.xml -libdir /path/to/ivylib -f -nc");
 	}
@@ -335,6 +336,7 @@ public class PoisonIvy {
 	 * 
 	 * @return the options
 	 */
+	@SuppressWarnings("static-access")
 	protected Options getOptions() {
 		Options opts = new Options();
 
@@ -348,10 +350,14 @@ public class PoisonIvy {
 		opts.addOption(NO_CLEAN_PARM, false,
 				"Do not remove source and api documentation after library dependency retrieval (default: clean)");
 		opts.addOption(LIB_DIR_PARM, true, "The directory to store the retrieved librarires (default: ./ivylib)");
-		opts.addOption(JAVA_OPTS_PARM, true,
-				"Java options to pass to the application jar (enclose in single quotes for multiple parameters)");
 		opts.addOption(MAIN_JAR_PARM, true, "The application jar to execute");
 		opts.addOption(MAIN_CLASS_PARM, true, "The main class to execute");
+
+		opts.addOption(OptionBuilder.withArgName("property=value").hasArgs(2).withValueSeparator()
+				.withDescription("Java -Dproperty=value command line properties").create("D"));
+
+		opts.addOption(OptionBuilder.withArgName("Xparm").hasArgs(1).withDescription("Java -Xparm command line properties")
+				.create("X"));
 
 		return opts;
 	}
