@@ -15,7 +15,7 @@ public class IvyLibraryRetriever {
 	private static final Logger log = LoggerFactory.getLogger(IvyLibraryRetriever.class);
 	
 	public static final String IVY_XML = "./ivy.xml";
-	public static final String LIBRARIES_DIR = "ivylib";
+	public static final String LIBRARIES_DIR = "./ivylib";
 	public static final String RESOLVE_PATTERN = "[artifact]-[revision](-[classifier]).[ext]";
 
 	private static final String[] srcsNDocs = { "-javadoc.", "-javadocs.", "-doc.", "-source.", "-sources.", "-src." };

@@ -29,7 +29,7 @@ public class PoisonIvy {
 	public static final String IVY_SETTINGS_PARM = "ivysettings";
 	public static final String IVY_PARM = "ivy";
 	public static final String RESOLVE_PATTERN_PARM = "rp";
-	public static final String NO_CLEAN = "nc";
+	public static final String NO_CLEAN_PARM = "nc";
 
 	public static final String POISONIVY_CONFIG = "poisonivy.config";
 
@@ -96,8 +96,7 @@ public class PoisonIvy {
 	}
 
 	protected void printHelpMessage() {
-		out.println("Poison Ivy - Java Library Dependency Resolver");
-		out.println("Resolves application dependencies on the client");
+		out.println("Poison Ivy - Java Library Dependency Resolver and Application Launcher");
 		out.println();
 		printCopyrightMessage();
 		out.println();
@@ -151,7 +150,7 @@ public class PoisonIvy {
 
 		if (cli.hasOption(LIB_DIR_PARM)) retriever.setLibdir(cli.getOptionValue(LIB_DIR_PARM));
 		
-		retriever.setCleanSourcesAndJavadoc(!cli.hasOption(NO_CLEAN));
+		retriever.setCleanSourcesAndJavadoc(!cli.hasOption(NO_CLEAN_PARM));
 
 		return retriever.retrieveLibraries(force, ivy, ivysettings);
 	}
@@ -165,7 +164,7 @@ public class PoisonIvy {
 				"The ivy settings file for library dependency resolution (default: built in settings)");
 		opts.addOption(RESOLVE_PATTERN_PARM, true, "The ivy resolve pattern (default: " + IvyLibraryRetriever.RESOLVE_PATTERN + ")");
 		opts.addOption(FORCE_PARM, false, "Force clean library retrieval (default: false)");
-		opts.addOption(NO_CLEAN, false, "Do not remove source and api documentation after library dependency retrieval (default: clean)");
+		opts.addOption(NO_CLEAN_PARM, false, "Do not remove source and api documentation after library dependency retrieval (default: clean)");
 		opts.addOption(LIB_DIR_PARM, true, "The directory to store the retrieved librarires (default: ./ivylib)");
 		opts.addOption(JAVA_OPTS_PARM, true,
 				"Java options to pass to the application jar (enclose in single quotes for multiple parameters)");
