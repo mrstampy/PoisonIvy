@@ -31,6 +31,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -61,9 +63,6 @@ public class PoisonIvy {
 
 	/** The Constant MAIN_JAR_PARM -{@value #MAIN_CLASS_PARM}. */
 	public static final String MAIN_CLASS_PARM = "mc";
-
-	/** The Constant JAVA_OPTS_PARM -{@value #JAVA_OPTS_PARM}. */
-	public static final String JAVA_OPTS_PARM = "jopts";
 
 	/** The Constant FORCE_PARM -{@value #FORCE_PARM}. */
 	public static final String FORCE_PARM = "f";
@@ -286,8 +285,9 @@ public class PoisonIvy {
 		command.add("java");
 		command.add("-cp");
 		command.add(IvyLibraryRetriever.getClasspath());
-
-		if (cli.hasOption(JAVA_OPTS_PARM)) command.add(cli.getOptionValue(JAVA_OPTS_PARM));
+		
+		addDOptions(cli, command);
+		addXOptions(cli, command);
 
 		if (cli.hasOption(MAIN_JAR_PARM)) {
 			command.add("-jar");
@@ -297,6 +297,24 @@ public class PoisonIvy {
 		}
 
 		return command.toArray(new String[] {});
+	}
+
+	private void addXOptions(CommandLine cli, List<String> command) {
+		String[] xs = cli.getOptionValues("X");
+		if(xs == null || xs.length == 0) return;
+		
+		for(String x : xs) {
+			command.add("-X" + x);
+		}
+	}
+
+	private void addDOptions(CommandLine cli, List<String> command) {
+		Properties props = cli.getOptionProperties("D");
+		if(props == null || props.isEmpty()) return;
+		
+		for(Entry<Object, Object> entry : props.entrySet()) {
+			command.add("-D" + entry.getKey() + "=" + entry.getValue());
+		}
 	}
 
 	/**
