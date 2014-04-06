@@ -1,3 +1,23 @@
+/*
+ * Poison Ivy - Java Library Dependency Resolver and Application Launcher 
+ *
+ * Copyright (C) 2014 Burton Alexander
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * 
+ */
 package com.github.mrtstampy.poisonivy;
 
 import java.io.File;
@@ -11,11 +31,25 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class uses <a href="http://ant.apache.org/ivy>Apache Ivy</a> to retrieve
+ * libraries for the ivy file specified. By default it is expected to be
+ * {@link IvyLibraryRetriever#IVY_XML} - './ivy.xml'.<br>
+ * <br>
+ * The libraries retrieved are saved by default to
+ * {@link IvyLibraryRetriever#LIBRARIES_DIR} - './ivylib'. Other parameters are
+ * explained below.
+ */
 public class IvyLibraryRetriever {
 	private static final Logger log = LoggerFactory.getLogger(IvyLibraryRetriever.class);
-	
+
+	/** The Constant IVY_XML './ivy.xml' */
 	public static final String IVY_XML = "./ivy.xml";
+
+	/** The Constant LIBRARIES_DIR './ivylib'. */
 	public static final String LIBRARIES_DIR = "./ivylib";
+
+	/** The Constant RESOLVE_PATTERN '[artifact]-[revision](-[classifier]).[ext]'. */
 	public static final String RESOLVE_PATTERN = "[artifact]-[revision](-[classifier]).[ext]";
 
 	private static final String[] srcsNDocs = { "-javadoc.", "-javadocs.", "-doc.", "-source.", "-sources.", "-src." };
@@ -25,18 +59,67 @@ public class IvyLibraryRetriever {
 	private String libdir = LIBRARIES_DIR;
 	private String resolvePattern = libdir + File.separator + RESOLVE_PATTERN;
 
+	/**
+	 * Retrieve libraries.
+	 * 
+	 * @return true, if successful
+	 * @throws Exception
+	 *           the exception
+	 */
 	public boolean retrieveLibraries() throws Exception {
 		return retrieveLibraries(false);
 	}
 
+	/**
+	 * Retrieve libraries.
+	 * 
+	 * @param force
+	 *          , if true will delete all libraries in the {@link #getLibdir()}
+	 *          directory and pull fresh copies from the Maven repositories.
+	 * 
+	 * @return true, if successful
+	 * @throws Exception
+	 *           the exception
+	 */
 	public boolean retrieveLibraries(boolean force) throws Exception {
 		return retrieveLibraries(force, null);
 	}
 
+	/**
+	 * Retrieve libraries.
+	 * 
+	 * @param force
+	 *          , if true will delete all libraries in the {@link #getLibdir()}
+	 *          directory and pull fresh copies from the Maven repositories.
+	 * 
+	 * @param ivyfile
+	 *          the path and filename of the ivy file if not {@value #IVY_XML}
+	 * 
+	 * @return true, if successful
+	 * @throws Exception
+	 *           the exception
+	 */
 	public boolean retrieveLibraries(boolean force, String ivyfile) throws Exception {
 		return retrieveLibraries(force, ivyfile, null);
 	}
 
+	/**
+	 * Retrieve libraries.
+	 * 
+	 * @param force
+	 *          , if true will delete all libraries in the {@link #getLibdir()}
+	 *          directory and pull fresh copies from the Maven repositories.
+	 * 
+	 * @param ivyfile
+	 *          the path and filename of the ivy file if not {@value #IVY_XML}
+	 * 
+	 * @param ivysettings
+	 *          the ivysettings to use for the supplied ivyfile value
+	 * 
+	 * @return true, if successful
+	 * @throws Exception
+	 *           the exception
+	 */
 	public boolean retrieveLibraries(boolean force, String ivyfile, String ivysettings) throws Exception {
 		boolean libsExist = librariesRetrieved();
 
@@ -52,6 +135,9 @@ public class IvyLibraryRetriever {
 		return execIvyMain(ivy.getAbsolutePath(), ivysettings);
 	}
 
+	/**
+	 * Clear the library directory of all files.
+	 */
 	public void clearLibraryDirectory() {
 		log.debug("Clearing library directory");
 		File libdir = new File(getLibdir());
@@ -85,7 +171,7 @@ public class IvyLibraryRetriever {
 
 		String[] cmd = createCommand(ivyfile, ivysettings);
 		logCmd(cmd);
-		
+
 		Process p = Runtime.getRuntime().exec(cmd);
 		int code = p.waitFor();
 
@@ -104,10 +190,10 @@ public class IvyLibraryRetriever {
 	}
 
 	private void logCmd(String[] cmd) {
-		if(!log.isDebugEnabled()) return;
-		
+		if (!log.isDebugEnabled()) return;
+
 		log.debug("Executing with the following command parameters:");
-		for(String s : cmd) {
+		for (String s : cmd) {
 			log.debug("**** Command parameter: {}", s);
 		}
 	}
@@ -190,6 +276,11 @@ public class IvyLibraryRetriever {
 		return file;
 	}
 
+	/**
+	 * Returns true if the {@link #getLibdir()} exists and is not empty.
+	 * 
+	 * @return true, if successful
+	 */
 	public boolean librariesRetrieved() {
 		File lib = new File(getLibdir());
 		if (!lib.exists()) return false;
@@ -202,30 +293,69 @@ public class IvyLibraryRetriever {
 		return libs != null && libs.length > 0;
 	}
 
+	/**
+	 * Gets the classpath used to start the currently running Java process.
+	 * 
+	 * @return the classpath
+	 */
 	public static String getClasspath() {
 		return System.getProperty("java.class.path");
 	}
 
+	/**
+	 * If true any source and javadoc jars are deleted after library retrieval.
+	 * 
+	 * @return true, if is clean sources and javadoc
+	 */
 	public boolean isCleanSourcesAndJavadoc() {
 		return cleanSourcesAndJavadoc;
 	}
 
+	/**
+	 * If true any source and javadoc jars are deleted after library retrieval.
+	 * 
+	 * @param cleanSourcesAndJavadoc
+	 *          the new clean sources and javadoc
+	 */
 	public void setCleanSourcesAndJavadoc(boolean cleanSourcesAndJavadoc) {
 		this.cleanSourcesAndJavadoc = cleanSourcesAndJavadoc;
 	}
 
+	/**
+	 * Gets the libdir, default {@value #LIBRARIES_DIR}.
+	 * 
+	 * @return the libdir
+	 */
 	public String getLibdir() {
 		return libdir == null ? LIBRARIES_DIR : libdir;
 	}
 
+	/**
+	 * Sets the libdir, default {@value #LIBRARIES_DIR}.
+	 * 
+	 * @param libdir
+	 *          the new libdir
+	 */
 	public void setLibdir(String libdir) {
 		this.libdir = libdir;
 	}
 
+	/**
+	 * Gets the resolve pattern including the {@link #getLibdir()}, default
+	 * {@value #LIBRARIES_DIR}/{@value #RESOLVE_PATTERN}.
+	 * 
+	 * @return the resolve pattern
+	 */
 	public String getResolvePattern() {
 		return resolvePattern == null ? getLibdir() + File.separator + RESOLVE_PATTERN : resolvePattern;
 	}
 
+	/**
+	 * Sets the resolve pattern, default {@value #RESOLVE_PATTERN}.
+	 * 
+	 * @param resolvePattern
+	 *          the new resolve pattern
+	 */
 	public void setResolvePattern(String resolvePattern) {
 		this.resolvePattern = resolvePattern;
 	}
