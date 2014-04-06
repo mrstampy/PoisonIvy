@@ -124,33 +124,42 @@ public class PoisonIvy {
 	 */
 	public boolean execute() {
 		try {
-			String[] poisonArgs = getArgs();
-			logArgs(poisonArgs);
-
-			Parser parser = new BasicParser();
-			CommandLine cli = parser.parse(getOptions(), poisonArgs);
-
-			if (cli.hasOption(HELP_PARM)) {
-				printHelpMessage();
-				return true;
-			} else if (executeLibraryRetrieval(cli)) {
-				if (cli.hasOption(MAIN_JAR_PARM) || cli.hasOption(MAIN_CLASS_PARM)) executeMain(cli);
-				return true;
-			} else {
-				log.error("Could not retrieve libraries via ivy");
-			}
+			return executeImpl();
 		} catch (Exception e) {
 			log.error("Could not execute", e);
-			System.out.println(stackTraceToString(e));
+			out.println(stackTraceToString(e));
+			printHelpMessage();
 		}
 
 		return false;
 	}
 
+	protected boolean executeImpl() throws Exception {
+		String[] poisonArgs = getArgs();
+		logArgs(poisonArgs);
+
+		Parser parser = new BasicParser();
+		CommandLine cli = parser.parse(getOptions(), poisonArgs);
+
+		if (cli.hasOption(HELP_PARM)) {
+			printHelpMessage();
+			return true;
+		}
+		
+		if (executeLibraryRetrieval(cli)) {
+			if (cli.hasOption(MAIN_JAR_PARM) || cli.hasOption(MAIN_CLASS_PARM)) executeMain(cli);
+			return true;
+		}
+		
+		log.error("Could not retrieve libraries via ivy");
+		
+		return false;
+	}
+
 	private String stackTraceToString(Exception e) {
 		StringWriter writer = new StringWriter();
-		PrintWriter pw = new PrintWriter(writer);
-		e.printStackTrace(pw);
+
+		e.printStackTrace(new PrintWriter(writer));
 
 		return writer.toString();
 	}
