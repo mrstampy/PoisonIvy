@@ -35,9 +35,11 @@ The [PoisonIvy](https://github.com/mrstampy/PoisonIvy/blob/master/PoisonIvy/src/
 ### Examples (embedded class)
 
 // forces update of libraries using the specified ivy.xml file
+
 new PoisonIvy("-ivy", "myivy.xml", "-f").execute();
 
 // forces update of libraries and (re)starts the Main application
+
 new PoisonIvy("-f", "-mc", "com.my.app.Main").execute();
 
 ## Dependencies
