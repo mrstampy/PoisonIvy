@@ -20,11 +20,16 @@
  */
 package com.github.mrstampy.poisonivy;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -290,15 +295,56 @@ public class IvyLibraryRetriever {
 		return command.toArray(new String[] {});
 	}
 
-	private File getFile(String fileName, String name) throws FileNotFoundException {
-		File file = new File(fileName);
+	private File getFile(String fileName, String name) throws URISyntaxException, IOException {
+		File file = getFromFileSystem(fileName, name);
+		if (file == null || !file.exists()) file = getFromClassPath(fileName);
 
 		if (file == null || !file.exists()) {
 			log.error("No {} file found for {}", name, fileName);
 			throw new FileNotFoundException(fileName);
 		}
 
+		log.debug("Returning file {}", file.getAbsolutePath());
+
 		return file;
+	}
+
+	private File getFromClassPath(String fileName) throws URISyntaxException, IOException {
+		String fn = fileName;
+		URL url = getClass().getResource(fn);
+		if (url == null) {
+			fn = "/" + fn;
+			url = getClass().getResource(fn);
+		}
+
+		return isJarUrl(url) ? extractToFileSystem(fn) : new File(url.toURI());
+	}
+
+	private boolean isJarUrl(URL url) {
+		return url != null && url.toString().startsWith("jar");
+	}
+
+	private File extractToFileSystem(String fileName) throws IOException {
+		BufferedInputStream is = new BufferedInputStream(getClass().getResourceAsStream(fileName));
+
+		File temp = File.createTempFile("ivy", "xml");
+
+		byte[] b = new byte[is.available()];
+		is.read(b);
+
+		BufferedOutputStream out = null;
+		try {
+			out = new BufferedOutputStream(new FileOutputStream(temp));
+			out.write(b);
+
+			return temp;
+		} finally {
+			if (out != null) out.close();
+		}
+	}
+
+	protected File getFromFileSystem(String fileName, String name) throws FileNotFoundException {
+		return new File(fileName);
 	}
 
 	/**
