@@ -90,6 +90,48 @@ public class PoisonIvy {
 
 	private String[] args;
 
+	private List<ProcessListener> resolveListeners = new ArrayList<ProcessListener>();
+	private List<ProcessListener> exeListeners = new ArrayList<ProcessListener>();
+
+	/**
+	 * Adds a {@link ProcessListener} to the Ivy resolve process
+	 * 
+	 * @param l
+	 */
+	public void addResolveListener(ProcessListener l) {
+		if (l != null && !resolveListeners.contains(l)) resolveListeners.add(l);
+	}
+
+	/**
+	 * Removes a {@link ProcessListener} from the Ivy resolve process
+	 * 
+	 * @param l
+	 */
+	public void removeResolveListener(ProcessListener l) {
+		if (l != null) resolveListeners.remove(l);
+	}
+
+	/**
+	 * Adds a {@link ProcessListener} to the executable process (should one of the
+	 * {@link #MAIN_CLASS_PARM} or {@link #MAIN_JAR_PARM} parameters be specified)
+	 * 
+	 * @param l
+	 */
+	public void addExeListener(ProcessListener l) {
+		if (l != null && !exeListeners.contains(l)) exeListeners.add(l);
+	}
+
+	/**
+	 * Removes a {@link ProcessListener} from the executable process (should one
+	 * of the {@link #MAIN_CLASS_PARM} or {@link #MAIN_JAR_PARM} parameters be
+	 * specified)
+	 * 
+	 * @param l
+	 */
+	public void removeExeListener(ProcessListener l) {
+		if (l != null) exeListeners.remove(l);
+	}
+
 	/**
 	 * The main method.
 	 * 
@@ -145,14 +187,14 @@ public class PoisonIvy {
 			printHelpMessage();
 			return true;
 		}
-		
+
 		if (executeLibraryRetrieval(cli)) {
 			if (cli.hasOption(MAIN_JAR_PARM) || cli.hasOption(MAIN_CLASS_PARM)) executeMain(cli);
 			return true;
 		}
-		
+
 		log.error("Could not retrieve libraries via ivy");
-		
+
 		return false;
 	}
 
@@ -276,7 +318,7 @@ public class PoisonIvy {
 	 * @see #JAVA_OPTS_PARM
 	 */
 	protected void executeMain(CommandLine cli) throws IOException {
-		Runtime.getRuntime().exec(getCommand(cli));
+		new ProcessContainer(Runtime.getRuntime().exec(getCommand(cli)), exeListeners);
 	}
 
 	/**
@@ -296,7 +338,7 @@ public class PoisonIvy {
 		command.add("java");
 		command.add("-cp");
 		command.add(IvyLibraryRetriever.getClasspath());
-		
+
 		addDOptions(cli, command);
 		addXOptions(cli, command);
 
@@ -312,18 +354,18 @@ public class PoisonIvy {
 
 	private void addXOptions(CommandLine cli, List<String> command) {
 		String[] xs = cli.getOptionValues("X");
-		if(xs == null || xs.length == 0) return;
-		
-		for(String x : xs) {
+		if (xs == null || xs.length == 0) return;
+
+		for (String x : xs) {
 			command.add("-X" + x);
 		}
 	}
 
 	private void addDOptions(CommandLine cli, List<String> command) {
 		Properties props = cli.getOptionProperties("D");
-		if(props == null || props.isEmpty()) return;
-		
-		for(Entry<Object, Object> entry : props.entrySet()) {
+		if (props == null || props.isEmpty()) return;
+
+		for (Entry<Object, Object> entry : props.entrySet()) {
 			command.add("-D" + entry.getKey() + "=" + entry.getValue());
 		}
 	}
@@ -346,6 +388,8 @@ public class PoisonIvy {
 	 */
 	protected boolean executeLibraryRetrieval(CommandLine cli) throws Exception {
 		IvyLibraryRetriever retriever = new IvyLibraryRetriever();
+
+		if (!resolveListeners.isEmpty()) retriever.addProcessListeners(resolveListeners);
 
 		String ivy = cli.getOptionValue(IVY_PARM);
 		String ivysettings = cli.getOptionValue(IVY_SETTINGS_PARM);

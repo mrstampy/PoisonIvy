@@ -27,7 +27,6 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -64,7 +63,19 @@ public class IvyLibraryRetriever {
 	private String libdir = LIBRARIES_DIR;
 	private String resolvePattern = libdir + File.separator + RESOLVE_PATTERN;
 
-	private volatile boolean resolving = false;
+	private List<ProcessListener> listeners = new ArrayList<ProcessListener>();
+
+	public void addProcessListeners(List<ProcessListener> listeners) {
+		this.listeners.addAll(listeners);
+	}
+
+	public void addProcessListener(ProcessListener l) {
+		if (l != null && !listeners.contains(l)) listeners.add(l);
+	}
+
+	public void removeProcessListener(ProcessListener l) {
+		if (l != null) listeners.remove(l);
+	}
 
 	/**
 	 * Retrieve libraries.
@@ -179,14 +190,11 @@ public class IvyLibraryRetriever {
 		String[] cmd = createCommand(ivyfile, ivysettings);
 		logCmd(cmd);
 
-		Process p = Runtime.getRuntime().exec(cmd);
-		resolving = true;
+		ProcessContainer pc = new ProcessContainer(Runtime.getRuntime().exec(cmd), listeners);
 
-		logOutput(p.getInputStream());
-		logError(p.getErrorStream());
-
-		int code = p.waitFor();
-		resolving = false;
+		int code = pc.getProcess().waitFor();
+		
+		pc.setRunning(false);
 
 		if (code == 0) {
 			log.debug("Ivy library retrieval completed with {}", code);
@@ -226,52 +234,6 @@ public class IvyLibraryRetriever {
 		for (File del : sourcesAndJavadoc) {
 			deleteFile(del);
 		}
-	}
-
-	private void logError(final InputStream in) {
-		Thread thread = new Thread("Resolver error stream thread") {
-			public void run() {
-				while (resolving) {
-					try {
-						Thread.sleep(200);
-						String error = getOutput(in);
-						if (error != null) System.err.print(error);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-
-		thread.start();
-	}
-
-	private void logOutput(final InputStream in) {
-		Thread thread = new Thread("Resolver out stream thread") {
-			public void run() {
-				while (resolving) {
-					try {
-						Thread.sleep(200);
-						String out = getOutput(in);
-						if (out != null) System.out.print(out);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		};
-
-		thread.start();
-	}
-
-	private String getOutput(InputStream in) throws IOException {
-		int available = in.available();
-		if (available <= 0) return null;
-
-		byte[] b = new byte[available];
-		in.read(b);
-
-		return new String(b);
 	}
 
 	private String[] createCommand(String ivyfile, String ivysettings) {
