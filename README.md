@@ -10,17 +10,17 @@ The [PoisonIvy](https://github.com/mrstampy/PoisonIvy/blob/master/PoisonIvy/src/
 
 ## Parameters
 
--h - Prints help message
--ivy [ARG] - The ivy file for library dependency resolution (default: ./ivy.xml)
--ivysettings [ARG] - The ivy settings file for library dependency resolution (default: built in settings)
--libdir [ARG] - The directory to store the retrieved librarires (default: ./ivylib)
--rp [ARG] - The ivy resolve pattern (default: [artifact]-[revision](-[classifier]).[ext])
--f - Force clean library retrieval (default: false)
--nc - Do not remove source and api documentation after library dependency retrieval (default: clean)
--D [ARG] - Java -Dproperty=value command line properties
--X [ARG] - Java -Xparm command line properties
--mc [ARG] - The main class to execute
--mj [ARG] - The application jar to execute
+- -h - Prints help message
+- -ivy [ARG] - The ivy file for library dependency resolution (default: ./ivy.xml)
+- -ivysettings [ARG] - The ivy settings file for library dependency resolution (default: built in settings)
+- -libdir [ARG] - The directory to store the retrieved librarires (default: ./ivylib)
+- -rp [ARG] - The ivy resolve pattern (default: [artifact]-[revision]&#040;-[classifier]&#041;.[ext])
+- -f - Force clean library retrieval (default: false)
+- -nc - Do not remove source and api documentation after library dependency retrieval (default: clean)
+- -D [ARG] - Java -Dproperty=value command line properties
+- -X [ARG] - Java -Xparm command line properties
+- -mc [ARG] - The main class to execute
+- -mj [ARG] - The application jar to execute
 
 ### Examples (command line)
 
