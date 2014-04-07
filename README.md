@@ -42,6 +42,10 @@ new PoisonIvy("-ivy", "myivy.xml", "-f").execute();
 
 new PoisonIvy("-f", "-mc", "com.my.app.Main").execute();
 
+## poisonivy.config
+
+Should no parameters be specified a [poisonivy.config](https://github.com/mrstampy/PoisonIvy/blob/master/PoisonIvy/poisonivy.sample.config) file, if it exists, is used to specify the parameters.  The first line of the file specifies the parameters as per the command line.
+
 ## Dependencies
 
 Poison Ivy's dependencies (ivy, slf4j-api and commons-cli) must be included with the application deliverable.
