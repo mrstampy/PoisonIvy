@@ -2,11 +2,16 @@
 
 This library allows Java applications to be delivered without bundling Maven library dependencies with the deliverables. Instead the application is delivered with an [ivy.xml file](http://ant.apache.org/ivy/history/latest-milestone/ivyfile.html) which specifies the library dependencies.  On application startup, should libraries require resolution, the libraries are downloaded and the application can be restarted automatically.
 
+## Release 1.1 - April 8, 2014
+
+* ivy.xml and ivysettings.xml can now be bundled in an application's jar file.  On resolution temp files are written containing the configuration for use with Ivy.
+* added ProcessListener interface to allow classes to receive the output and error streams from the resolution process and the executable process, if specified.
+
 ## Maven dependency
            <dependency>
                <groupId>com.github.mrstampy</groupId>
                <artifactId>PoisonIvy</artifactId>
-               <version>1.0</version>
+               <version>1.1</version>
            </dependency>
 
 
