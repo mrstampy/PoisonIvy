@@ -58,7 +58,7 @@ public class IvyLibraryRetriever {
 
 	private String libdir = LIBRARIES_DIR;
 	private String resolvePattern = libdir + File.separator + RESOLVE_PATTERN;
-	
+
 	private volatile boolean resolving = false;
 
 	/**
@@ -179,7 +179,7 @@ public class IvyLibraryRetriever {
 
 		logOutput(p.getInputStream());
 		logError(p.getErrorStream());
-		
+
 		int code = p.waitFor();
 		resolving = false;
 
@@ -226,36 +226,36 @@ public class IvyLibraryRetriever {
 	private void logError(final InputStream in) {
 		Thread thread = new Thread("Resolver error stream thread") {
 			public void run() {
-				try {
-					while(resolving) {
+				while (resolving) {
+					try {
 						Thread.sleep(200);
 						String error = getOutput(in);
 						if (error != null) System.err.print(error);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 		};
-		
+
 		thread.start();
 	}
 
 	private void logOutput(final InputStream in) {
-		Thread thread = new Thread("Resolver error stream thread") {
+		Thread thread = new Thread("Resolver out stream thread") {
 			public void run() {
-				try {
-					while(resolving) {
+				while (resolving) {
+					try {
 						Thread.sleep(200);
 						String out = getOutput(in);
 						if (out != null) System.out.print(out);
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
 		};
-		
+
 		thread.start();
 	}
 
