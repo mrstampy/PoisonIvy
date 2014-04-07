@@ -58,6 +58,8 @@ public class IvyLibraryRetriever {
 
 	private String libdir = LIBRARIES_DIR;
 	private String resolvePattern = libdir + File.separator + RESOLVE_PATTERN;
+	
+	private volatile boolean resolving = false;
 
 	/**
 	 * Retrieve libraries.
@@ -173,10 +175,13 @@ public class IvyLibraryRetriever {
 		logCmd(cmd);
 
 		Process p = Runtime.getRuntime().exec(cmd);
-		int code = p.waitFor();
+		resolving = true;
 
 		logOutput(p.getInputStream());
 		logError(p.getErrorStream());
+		
+		int code = p.waitFor();
+		resolving = false;
 
 		if (code == 0) {
 			log.debug("Ivy library retrieval completed with {}", code);
@@ -218,20 +223,40 @@ public class IvyLibraryRetriever {
 		}
 	}
 
-	private void logError(InputStream in) throws IOException {
-		String error = getOutput(in);
-		if (error != null) {
-			System.err.println(error);
-			log.error(error);
-		}
+	private void logError(final InputStream in) {
+		Thread thread = new Thread("Resolver error stream thread") {
+			public void run() {
+				try {
+					while(resolving) {
+						Thread.sleep(200);
+						String error = getOutput(in);
+						if (error != null) System.err.print(error);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		
+		thread.start();
 	}
 
-	private void logOutput(InputStream in) throws IOException {
-		String out = getOutput(in);
-		if (out != null) {
-			System.out.println(out);
-			log.debug(getOutput(in));
-		}
+	private void logOutput(final InputStream in) {
+		Thread thread = new Thread("Resolver error stream thread") {
+			public void run() {
+				try {
+					while(resolving) {
+						Thread.sleep(200);
+						String out = getOutput(in);
+						if (out != null) System.out.print(out);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		};
+		
+		thread.start();
 	}
 
 	private String getOutput(InputStream in) throws IOException {
