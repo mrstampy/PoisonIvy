@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PoisonIvy by mrstampy</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/mrstampy/PoisonIvy">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/mrstampy/PoisonIvy/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/mrstampy/PoisonIvy/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>PoisonIvy</h1>
+          <p>Poison Ivy - Java Library Dependency Resolver and Application Launcher</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/mrstampy">mrstampy</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="poison-ivy---java-library-dependency-resolver-and-application-launcher" class="anchor" href="#poison-ivy---java-library-dependency-resolver-and-application-launcher"><span class="octicon octicon-link"></span></a>Poison Ivy - Java Library Dependency Resolver and Application Launcher</h1>
+
+<p>This library allows Java applications to be delivered without bundling Maven library dependencies with the deliverables. Instead the application is delivered with an <a href="http://ant.apache.org/ivy/history/latest-milestone/ivyfile.html">ivy.xml file</a> which specifies the library dependencies.  On application startup, should libraries require resolution, the libraries are downloaded and the application can be restarted automatically.</p>
+
+<p>The <a href="https://github.com/mrstampy/PoisonIvy/blob/master/PoisonIvy/src/com/github/mrstampy/poisonivy/PoisonIvy.java">PoisonIvy</a> class can be used in one of three ways:</p>
+
+<ul>
+<li>A separate application</li>
+<li>An embedded class</li>
+<li>A main class superclass</li>
+</ul><h2>
+<a name="parameters" class="anchor" href="#parameters"><span class="octicon octicon-link"></span></a>Parameters</h2>
+
+<ul>
+<li>-h - Prints help message</li>
+<li>-ivy [ARG] - The ivy file for library dependency resolution (default: ./ivy.xml)</li>
+<li>-ivysettings [ARG] - The ivy settings file for library dependency resolution (default: built in settings)</li>
+<li>-libdir [ARG] - The directory to store the retrieved librarires (default: ./ivylib)</li>
+<li>-rp [ARG] - The ivy resolve pattern (default: [artifact]-[revision](-[classifier]).[ext])</li>
+<li>-f - Force clean library retrieval (default: false)</li>
+<li>-nc - Do not remove source and api documentation after library dependency retrieval (default: clean)</li>
+<li>-D [ARG] - Java -Dproperty=value command line properties</li>
+<li>-X [ARG] - Java -Xparm command line properties</li>
+<li>-mc [ARG] - The main class to execute</li>
+<li>-mj [ARG] - The application jar to execute</li>
+</ul><h3>
+<a name="examples-command-line" class="anchor" href="#examples-command-line"><span class="octicon octicon-link"></span></a>Examples (command line)</h3>
+
+<p>-mj MyApplication.jar</p>
+
+<p>-mj MyApplication.jar -X mx1000m -X ms500m</p>
+
+<p>-mc com.my.MainClass -X mx1000m -X ms500m -D my.settings.file=/some/path/and/file</p>
+
+<p>-ivy /path/to/ivy.xml -ivysettings /path/to/ivysettings.xml -libdir /path/to/ivylib -f -nc</p>
+
+<h3>
+<a name="examples-embedded-class" class="anchor" href="#examples-embedded-class"><span class="octicon octicon-link"></span></a>Examples (embedded class)</h3>
+
+<p>// forces update of libraries using the specified ivy.xml file</p>
+
+<p>new PoisonIvy("-ivy", "myivy.xml", "-f").execute();</p>
+
+<p>// forces update of libraries and (re)starts the Main application</p>
+
+<p>new PoisonIvy("-f", "-mc", "com.my.app.Main").execute();</p>
+
+<h2>
+<a name="dependencies" class="anchor" href="#dependencies"><span class="octicon octicon-link"></span></a>Dependencies</h2>
+
+<p>Poison Ivy's dependencies (ivy, slf4j-api and commons-cli) must be included with the application deliverable.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
