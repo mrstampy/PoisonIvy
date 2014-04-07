@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ant [
-	<!ENTITY poison.ivy.version "1.1-SNAPSHOT">
+	<!ENTITY poison.ivy.version "1.0">
 ]>
 <project name="PoisonIvy" basedir="." default="create deployables" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:m="http://ant.apache.org/ivy/maven" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
@@ -43,7 +43,10 @@
 	<target name="staging" depends="create deployables, deploy staging"/>
 	
 	<target name="deploy snapshot">
-		<ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
+		<antcall target="copypom">
+			<param name="to.pom" value="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
+			<param name="from.pom" value="${basedir}/pom.xml"/>
+		</antcall>
 		
 		<antcall target="deployImpl">
 			<param name="resolver" value="sonatype-nexus-snapshots"/>
@@ -54,7 +57,10 @@
 	</target>
 	
 	<target name="deploy staging">
-		<ivy:makepom ivyfile="${basedir}/ivy.xml" pomfile="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
+		<antcall target="copypom">
+			<param name="to.pom" value="${basedir}/build/PoisonIvy-&poison.ivy.version;.pom"/>
+			<param name="from.pom" value="${basedir}/pom.xml"/>
+		</antcall>
 		
 		<antcall target="deployImpl">
 			<param name="resolver" value="sonatype-nexus-staging"/>
@@ -81,7 +87,7 @@
 			pubrevision="&poison.ivy.version;">
 		</ivy:publish>
 	</target>
-	
+
 	<!--
 		Creates all the artifacts
 	-->
