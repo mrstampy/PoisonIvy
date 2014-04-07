@@ -43,6 +43,16 @@
 
 <p>This library allows Java applications to be delivered without bundling Maven library dependencies with the deliverables. Instead the application is delivered with an <a href="http://ant.apache.org/ivy/history/latest-milestone/ivyfile.html">ivy.xml file</a> which specifies the library dependencies.  On application startup, should libraries require resolution, the libraries are downloaded and the application can be restarted automatically.</p>
 
+<h2>
+<a name="maven-dependency" class="anchor" href="#maven-dependency"><span class="octicon octicon-link"></span></a>Maven dependency</h2>
+
+<pre><code>       &lt;dependency&gt;
+           &lt;groupId&gt;com.github.mrstampy&lt;/groupId&gt;
+           &lt;artifactId&gt;PoisonIvy&lt;/artifactId&gt;
+           &lt;version&gt;1.0&lt;/version&gt;
+       &lt;/dependency&gt;
+</code></pre>
+
 <p>The <a href="https://github.com/mrstampy/PoisonIvy/blob/master/PoisonIvy/src/com/github/mrstampy/poisonivy/PoisonIvy.java">PoisonIvy</a> class can be used in one of three ways:</p>
 
 <ul>
