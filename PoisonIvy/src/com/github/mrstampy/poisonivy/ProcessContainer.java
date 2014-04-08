@@ -97,7 +97,7 @@ class ProcessContainer {
 	}
 
 	private void output(String out) {
-		System.out.println(out);
+		System.out.print(out);
 
 		for (ProcessListener l : listeners) {
 			l.output(out);
