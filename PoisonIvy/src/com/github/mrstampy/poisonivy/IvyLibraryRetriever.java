@@ -45,6 +45,8 @@ import org.slf4j.LoggerFactory;
  * below.
  */
 public class IvyLibraryRetriever {
+	private static final String IVYTEMP_PFX = "ivytemp";
+
 	private static final Logger log = LoggerFactory.getLogger(IvyLibraryRetriever.class);
 
 	/** The Constant IVY_XML {@value #IVY_XML} */
@@ -184,27 +186,38 @@ public class IvyLibraryRetriever {
 		log.debug("Retrieving libraries using {}", ivyfile);
 		if (ivysettings != null) {
 			log.debug("...and ivy settings {}", ivysettings);
-			getFile(ivysettings, "ivy settings");
+			File settings = getFile(ivysettings, "ivy settings");
+			ivysettings = settings.getAbsolutePath();
 		}
 
-		String[] cmd = createCommand(ivyfile, ivysettings);
-		logCmd(cmd);
+		try {
+			String[] cmd = createCommand(ivyfile, ivysettings);
+			logCmd(cmd);
 
-		ProcessContainer pc = new ProcessContainer(Runtime.getRuntime().exec(cmd), listeners);
+			ProcessContainer pc = new ProcessContainer(Runtime.getRuntime().exec(cmd), listeners);
 
-		int code = pc.getProcess().waitFor();
-		
-		pc.setRunning(false);
+			int code = pc.getProcess().waitFor();
 
-		if (code == 0) {
-			log.debug("Ivy library retrieval completed with {}", code);
-			if (isCleanSourcesAndJavadoc()) cleanSourcesAndJavadoc();
-			return true;
+			pc.setRunning(false);
+
+			if (code == 0) {
+				log.debug("Ivy library retrieval completed with {}", code);
+				if (isCleanSourcesAndJavadoc()) cleanSourcesAndJavadoc();
+				return true;
+			}
+
+			log.error("Ivy library retrieval completed with {}", code);
+
+			return false;
+		} finally {
+			cleanTempFile(ivyfile);
+			cleanTempFile(ivysettings);
 		}
+	}
 
-		log.error("Ivy library retrieval completed with {}", code);
-
-		return false;
+	private void cleanTempFile(String file) {
+		File f = new File(file);
+		if (f.getName().startsWith(IVYTEMP_PFX)) f.delete();
 	}
 
 	private void logCmd(String[] cmd) {
@@ -289,7 +302,7 @@ public class IvyLibraryRetriever {
 	private File extractToFileSystem(String fileName) throws IOException {
 		BufferedInputStream is = new BufferedInputStream(getClass().getResourceAsStream(fileName));
 
-		File temp = File.createTempFile("ivy", "xml");
+		File temp = File.createTempFile(IVYTEMP_PFX, "xml");
 
 		byte[] b = new byte[is.available()];
 		is.read(b);
