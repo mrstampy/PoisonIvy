@@ -44,6 +44,13 @@
 <p>This library allows Java applications to be delivered without bundling Maven library dependencies with the deliverables. Instead the application is delivered with an <a href="http://ant.apache.org/ivy/history/latest-milestone/ivyfile.html">ivy.xml file</a> which specifies the library dependencies.  On application startup, should libraries require resolution, the libraries are downloaded and the application can be restarted automatically.</p>
 
 <h2>
+<a name="release-12---april-11-2014" class="anchor" href="#release-12---april-11-2014"><span class="octicon octicon-link"></span></a>Release 1.2 - April 11, 2014</h2>
+
+<ul>
+<li>System.out.println -&gt; System.out.print for resolution output stream</li>
+<li>Jar'd ivysettings.xml now dealt with properly</li>
+<li>temp files cleaned up</li>
+</ul><h2>
 <a name="release-11---april-8-2014" class="anchor" href="#release-11---april-8-2014"><span class="octicon octicon-link"></span></a>Release 1.1 - April 8, 2014</h2>
 
 <ul>
@@ -55,7 +62,7 @@
 <pre><code>       &lt;dependency&gt;
            &lt;groupId&gt;com.github.mrstampy&lt;/groupId&gt;
            &lt;artifactId&gt;PoisonIvy&lt;/artifactId&gt;
-           &lt;version&gt;1.1&lt;/version&gt;
+           &lt;version&gt;1.2&lt;/version&gt;
        &lt;/dependency&gt;
 </code></pre>
 
