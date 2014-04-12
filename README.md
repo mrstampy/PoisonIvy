@@ -17,7 +17,7 @@ This library allows Java applications to be delivered without bundling Maven lib
            <dependency>
                <groupId>com.github.mrstampy</groupId>
                <artifactId>PoisonIvy</artifactId>
-               <version>1.2</version>
+               <version>1.3</version>
            </dependency>
 
 
