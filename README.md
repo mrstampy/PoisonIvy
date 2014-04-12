@@ -2,7 +2,7 @@
 
 This library allows Java applications to be delivered without bundling Maven library dependencies with the deliverables. Instead the application is delivered with an [ivy.xml file](http://ant.apache.org/ivy/history/latest-milestone/ivyfile.html) which specifies the library dependencies.  On application startup, should libraries require resolution, the libraries are downloaded and the application can be restarted automatically.
 
-## Release 1.2 - April 11, 2014
+## Release 1.3 - April 11, 2014
 
 * System.out.println -> System.out.print for resolution output stream
 * Jar'd ivysettings.xml now dealt with properly
