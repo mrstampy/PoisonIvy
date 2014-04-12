@@ -216,6 +216,7 @@ public class IvyLibraryRetriever {
 	}
 
 	private void cleanTempFile(String file) {
+		if(file == null) return;
 		File f = new File(file);
 		if (f.getName().startsWith(IVYTEMP_PFX)) f.delete();
 	}
