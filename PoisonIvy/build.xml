@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE ant [
-	<!ENTITY poison.ivy.version "1.2">
+	<!ENTITY poison.ivy.version "1.4">
 ]>
 <project name="PoisonIvy" basedir="." default="create deployables" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:m="http://ant.apache.org/ivy/maven" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 

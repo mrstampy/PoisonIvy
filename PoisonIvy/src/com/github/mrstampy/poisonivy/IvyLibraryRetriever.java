@@ -388,6 +388,7 @@ public class IvyLibraryRetriever {
 	 */
 	public void setLibdir(String libdir) {
 		this.libdir = libdir;
+		setResolvePattern(libdir + File.separator + RESOLVE_PATTERN);
 	}
 
 	/**
